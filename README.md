@@ -36,7 +36,7 @@ No diretório raiz do projeto, execute o seguinte comando para construir a image
 
 - docker-compose up --build
 
-3**Acessar a aplicação:**
+3. **Acessar a aplicação:**
 
 Após os containers serem iniciados, a aplicação estará disponível em http://localhost:8080.
 
