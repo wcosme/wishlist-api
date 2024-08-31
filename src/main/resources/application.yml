@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: wishlist-service
+
+server:
+  port: 8080
+
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/wishlist
+      database: wishlist
+
+logging:
+  level:
+    root: INFO
+    com.wishlist: DEBUG
