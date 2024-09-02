@@ -4,16 +4,15 @@ import br.com.wishlist.application.usecase.SaveProductUseCase;
 import br.com.wishlist.domain.Product;
 import br.com.wishlist.domain.Wishlist;
 import br.com.wishlist.infrastructure.WishlistRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SaveProductUseCaseImpl implements SaveProductUseCase {
 
     private final WishlistRepository wishlistRepository;
 
-    public SaveProductUseCaseImpl(WishlistRepository wishlistRepository) {
-        this.wishlistRepository = wishlistRepository;
-    }
 
     @Override
     public void execute(String clientId, Product product) throws Exception {

@@ -3,16 +3,14 @@ package br.com.wishlist.application.usecase.impl;
 import br.com.wishlist.application.usecase.DeleteProductUseCase;
 import br.com.wishlist.domain.Wishlist;
 import br.com.wishlist.infrastructure.WishlistRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DeleteProductUseCaseImpl implements DeleteProductUseCase {
 
     private final WishlistRepository wishlistRepository;
-
-    public DeleteProductUseCaseImpl(WishlistRepository wishlistRepository) {
-        this.wishlistRepository = wishlistRepository;
-    }
 
     @Override
     public void execute(String clientId, String productId) throws Exception {
