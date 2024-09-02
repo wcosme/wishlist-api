@@ -1,8 +1,10 @@
 package br.com.wishlist.application.core.usecase.impl;
 
+import br.com.wishlist.adapters.in.controller.mapper.WishlistMapper;
+import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
+import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.usecase.CheckProductUseCase;
 import br.com.wishlist.application.core.domain.Wishlist;
-import br.com.wishlist.infrastructure.WishlistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +12,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CheckProductUseCaseImpl implements CheckProductUseCase {
 
-    private final WishlistRepository wishlistRepository;
+    private final MongoWishlistRepository repository;
+    private final WishlistMapper mapper;
 
     @Override
     public boolean execute(String clientId, String productId) throws Exception {
-        Wishlist wishlist = wishlistRepository.findByClientId(clientId)
+        WishlistEntity entity = repository.findByClientId(clientId)
                 .orElseThrow(() -> new Exception("Wishlist not found for client: " + clientId));
 
-        return wishlist.getProducts().stream()
-                .anyMatch(product -> product.getProductId().equals(productId));
+        Wishlist wishlist = mapper.toDomain(entity);
+
+        // Verifica se o produto existe na Wishlist (domínio)
+        return wishlist.hasProduct(productId);
     }
 }

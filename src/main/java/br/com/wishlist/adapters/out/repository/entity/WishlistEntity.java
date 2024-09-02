@@ -6,13 +6,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "products")
-public class ProductEntity {
+@Document(collection = "wishlists")
+public class WishlistEntity {
 
     @Id
-    private String productId;
-    private String name;
+    private String clientId;
+    private List<ProductEntity> productsEntityList;
 }

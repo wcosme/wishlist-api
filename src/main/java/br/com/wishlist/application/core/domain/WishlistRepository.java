@@ -1,10 +1,9 @@
 package br.com.wishlist.application.core.domain;
 
+import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
+
 import java.util.Optional;
 
 public interface WishlistRepository {
-    Optional<Wishlist> findByClientId(String clientId);
-    Wishlist save(Wishlist wishlist);
-    boolean deleteProductFromWishlist(String clientId, String productId);
-    boolean existsProductInWishlist(String clientId, String productId);
+    Optional<WishlistEntity> findByClientId(String clientId);
 }

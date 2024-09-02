@@ -1,35 +1,84 @@
 package br.com.wishlist.application.core.domain;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import java.util.HashSet;
-import java.util.Set;
-
-@Data
-@NoArgsConstructor
-@Document
 public class Wishlist {
 
-    @Id
     private String clientId;
-    private Set<Product> products = new HashSet<>();
+    private List<Product> products;
 
+    // Construtor padrão
+    public Wishlist() {
+        this.products = new ArrayList<>();
+    }
+
+    // Construtor com argumentos
     public Wishlist(String clientId) {
+        this.clientId = clientId;
+        this.products = new ArrayList<>();
+    }
+
+    // Construtor com todos os argumentos
+    public Wishlist(String clientId, List<Product> products) {
+        this.clientId = clientId;
+        this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
+    }
+
+    // Getters e Setters
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
-    public void addProduct(Product product) throws Exception {
+    public List<Product> getProducts() {
+        return new ArrayList<>(products); // Retorna uma cópia para proteger a imutabilidade interna
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products != null ? new ArrayList<>(products) : new ArrayList<>();
+    }
+
+    // Métodos de domínio
+    public boolean addProduct(Product product) {
         if (products.size() >= 20) {
-            throw new Exception("Wishlist cannot contain more than 20 products.");
+            throw new IllegalStateException("Cannot add more than 20 products to the wishlist.");
         }
-        products.add(product);
+        return products.add(product);
     }
 
     public boolean removeProductById(String productId) {
         return products.removeIf(product -> product.getProductId().equals(productId));
     }
 
+    public boolean hasProduct(String productId) {
+        return products.stream().anyMatch(product -> product.getProductId().equals(productId));
+    }
+
+    // equals e hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Wishlist wishlist = (Wishlist) o;
+        return Objects.equals(clientId, wishlist.clientId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientId);
+    }
+
+    // toString
+    @Override
+    public String toString() {
+        return "Wishlist{" +
+                "clientId='" + clientId + '\'' +
+                ", products=" + products +
+                '}';
+    }
 }
