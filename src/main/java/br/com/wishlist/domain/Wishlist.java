@@ -28,11 +28,8 @@ public class Wishlist {
         products.add(product);
     }
 
-    public void removeProduct(Product product) {
-        products.remove(product);
+    public boolean removeProductById(String productId) {
+        return products.removeIf(product -> product.getProductId().equals(productId));
     }
 
-    public boolean hasProduct(Product product) {
-        return products.contains(product);
-    }
 }
