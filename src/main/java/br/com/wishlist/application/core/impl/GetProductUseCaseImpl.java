@@ -1,6 +1,6 @@
-package br.com.wishlist.application.core.usecase.impl;
+package br.com.wishlist.application.core.impl;
 
-import br.com.wishlist.adapters.in.controller.mapper.WishlistMapper;
+import br.com.wishlist.adapters.out.mapper.WishlistMapper;
 import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.application.core.usecase.GetProductUseCase;
 import br.com.wishlist.application.core.domain.Wishlist;

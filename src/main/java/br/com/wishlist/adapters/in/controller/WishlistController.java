@@ -1,6 +1,7 @@
 package br.com.wishlist.adapters.in.controller;
 
-import br.com.wishlist.adapters.in.controller.mapper.WishlistMapper;
+import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
+import br.com.wishlist.adapters.out.mapper.WishlistMapper;
 import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
 import br.com.wishlist.adapters.in.controller.request.RemoveProductRequest;
 import br.com.wishlist.adapters.in.controller.response.WishlistResponse;
@@ -22,18 +23,19 @@ public class WishlistController {
     private final GetProductUseCase getProductUseCase;
     private final CheckProductUseCase checkProductUseCase;
     private final WishlistMapper mapper;
+    private final WishlistControllerMapper controllerMapper;
 
     @PostMapping("/{clientId}/products")
     public ResponseEntity<WishlistResponse> addProduct(
             @PathVariable String clientId,
             @RequestBody AddProductRequest request) throws Exception {
 
-        Product product = mapper.toProduct(request);
+        Product product = controllerMapper.toProduct(request);
         saveProductUseCase.execute(clientId, product);
 
         // Recuperar a Wishlist atualizada para resposta
         Wishlist wishlist = getProductUseCase.execute(clientId);
-        WishlistResponse response = mapper.toWishlistResponse(wishlist);
+        WishlistResponse response = controllerMapper.toWishlistResponse(wishlist);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -53,7 +55,7 @@ public class WishlistController {
 
         try {
             Wishlist wishlist = getProductUseCase.execute(clientId);
-            WishlistResponse response = mapper.toWishlistResponse(wishlist);
+            WishlistResponse response = controllerMapper.toWishlistResponse(wishlist);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
