@@ -1,4 +1,4 @@
-package br.com.wishlist.domain;
+package br.com.wishlist.application.core.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

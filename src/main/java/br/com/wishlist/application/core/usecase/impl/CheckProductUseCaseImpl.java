@@ -1,7 +1,7 @@
-package br.com.wishlist.application.usecase.impl;
+package br.com.wishlist.application.core.usecase.impl;
 
-import br.com.wishlist.application.usecase.CheckProductUseCase;
-import br.com.wishlist.domain.Wishlist;
+import br.com.wishlist.application.core.usecase.CheckProductUseCase;
+import br.com.wishlist.application.core.domain.Wishlist;
 import br.com.wishlist.infrastructure.WishlistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
