@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 public class WishlistMapper {
 
     public Wishlist toDomain(WishlistEntity entity) {
-        if (entity == null) {
-            return null;
-        }
         List<Product> products = entity.getProductsEntityList().stream()
                 .map(this::toDomain)  // Converte ProductEntity para Product
                 .collect(Collectors.toList());
@@ -23,9 +20,6 @@ public class WishlistMapper {
     }
 
     public WishlistEntity toEntity(Wishlist wishlist) {
-        if (wishlist == null) {
-            return null;
-        }
         List<ProductEntity> productsEntityList = wishlist.getProducts().stream()
                 .map(this::toEntity)  // Converte Product para ProductEntity
                 .collect(Collectors.toList());
@@ -33,16 +27,10 @@ public class WishlistMapper {
     }
 
     private Product toDomain(ProductEntity entity) {
-        if (entity == null) {
-            return null;
-        }
         return new Product(entity.getProductId(), entity.getName());
     }
 
     private ProductEntity toEntity(Product product) {
-        if (product == null) {
-            return null;
-        }
         return new ProductEntity(product.getProductId(), product.getName());
     }
 }
