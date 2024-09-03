@@ -16,19 +16,20 @@ public class CheckProductUseCaseImpl implements CheckProductUseCase {
     private final MongoWishlistRepository repository;
     private final WishlistMapper mapper;
 
-    @Override
-    public boolean execute(String clientId, String productId) throws Exception {
+    public boolean execute(String clientId, String productId) {
         WishlistEntity entity = repository.findByClientId(clientId)
-                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId, 404));
+                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
 
         Wishlist wishlist = mapper.toDomain(entity);
 
-        // Verifica se o produto está na wishlist
+        // Depuração: imprimir produtos
+        System.out.println("Products in Wishlist: " + wishlist.getProducts());
+
         boolean productExists = wishlist.getProducts().stream()
                 .anyMatch(product -> product.getProductId().equals(productId));
 
         if (!productExists) {
-            throw new CustomException("Product not found in the wishlist: " + productId, 404);
+            throw new CustomException("Product not found in the wishlist: " + productId);
         }
         return true;
     }

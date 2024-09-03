@@ -2,9 +2,11 @@ package br.com.wishlist.application.core.impl;
 
 import br.com.wishlist.adapters.out.mapper.WishlistMapper;
 import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
+import br.com.wishlist.adapters.out.repository.entity.ProductEntity;
 import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
+import br.com.wishlist.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,14 +15,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteProductUseCaseImplTest {
+class CheckProductUseCaseImplTest {
 
     @Mock
     private MongoWishlistRepository repository;
@@ -29,10 +31,10 @@ class DeleteProductUseCaseImplTest {
     private WishlistMapper mapper;
 
     @InjectMocks
-    private DeleteProductUseCaseImpl useCase;
+    private CheckProductUseCaseImpl useCase;
 
-    private Wishlist wishlist;
     private WishlistEntity entity;
+    private Wishlist wishlist;
 
     @BeforeEach
     void setUp() {
@@ -41,47 +43,51 @@ class DeleteProductUseCaseImplTest {
     }
 
     @Test
-    void execute_ShouldRemoveProductFromWishlist() throws Exception {
+    void execute_ShouldReturnTrueWhenProductExistsInWishlist() {
         // Arrange
-        wishlist.addProduct(new Product("product1", "Product 1"));
+        ProductEntity productEntity = new ProductEntity("product1", "Product 1");
+        entity = new WishlistEntity("client1", List.of(productEntity));
+
         when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(wishlist);
-        when(mapper.toEntity(wishlist)).thenReturn(entity);
+        when(mapper.toDomain(entity)).thenReturn(new Wishlist("client1", List.of(new Product("product1", "Product 1"))));
 
         // Act
-        useCase.execute("client1", "product1");
+        boolean result = useCase.execute("client1", "product1");
 
         // Assert
-        assertTrue(wishlist.getProducts().isEmpty());
-        verify(repository).save(entity);
+        assertTrue(result, "Product should exist in the wishlist");
+        verify(repository).findByClientId("client1");
+        verify(mapper).toDomain(entity);
     }
 
     @Test
-    void execute_ShouldThrowExceptionWhenWishlistNotFound() {
+    void execute_ShouldThrowCustomExceptionWhenWishlistNotFound() {
         // Arrange
         when(repository.findByClientId("client1")).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(Exception.class, () -> {
+        CustomException exception = assertThrows(CustomException.class, () -> {
             useCase.execute("client1", "product1");
         });
 
         assertEquals("Wishlist not found for client: client1", exception.getMessage());
-        verify(repository, never()).save(any());
+        verify(repository).findByClientId("client1");
+        verify(mapper, never()).toDomain(any());
     }
 
     @Test
-    void execute_ShouldThrowExceptionWhenProductNotFoundInWishlist() {
+    void execute_ShouldThrowCustomExceptionWhenProductNotFoundInWishlist() {
         // Arrange
         when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
         when(mapper.toDomain(entity)).thenReturn(wishlist);
 
         // Act & Assert
-        Exception exception = assertThrows(Exception.class, () -> {
+        CustomException exception = assertThrows(CustomException.class, () -> {
             useCase.execute("client1", "product1");
         });
 
         assertEquals("Product not found in the wishlist: product1", exception.getMessage());
-        verify(repository, never()).save(any());
+        verify(repository).findByClientId("client1");
+        verify(mapper).toDomain(entity);
     }
 }

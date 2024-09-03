@@ -1,19 +1,20 @@
 package br.com.wishlist.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class ErrorDetails {
+@Builder
+public record ErrorDetails (
 
-    private String timestamp;
-    private int code;
-    private String status;
-    private List<String> errors;
+        @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
+        LocalDateTime timestamp,
+        Integer code,
+        String status,
+        List<String> errors
+
+) {
 
 }

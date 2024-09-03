@@ -17,16 +17,16 @@ public class DeleteProductUseCaseImpl implements DeleteProductUseCase {
     private final WishlistMapper mapper;
 
     @Override
-    public void execute(String clientId, String productId) throws Exception {
+    public void execute(String clientId, String productId){
 
         WishlistEntity entity = repository.findByClientId(clientId)
-                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId, 404));
+                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
 
         Wishlist wishlist = mapper.toDomain(entity);
 
         boolean removed = wishlist.removeProductById(productId);
         if (!removed) {
-            throw new CustomException("Product not found in the wishlist: " + productId, 404);
+            throw new CustomException("Product not found in the wishlist: " + productId);
         }
 
         repository.save(mapper.toEntity(wishlist));

@@ -19,7 +19,7 @@ public class SaveProductUseCaseImpl implements SaveProductUseCase {
     private final WishlistMapper mapper;
 
     @Override
-    public void execute(String clientId, Product product) throws Exception {
+    public void execute(String clientId, Product product){
 
         Optional<WishlistEntity> optional = repository.findByClientId(clientId);
 

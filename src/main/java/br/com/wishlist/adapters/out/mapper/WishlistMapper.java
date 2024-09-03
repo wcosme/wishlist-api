@@ -16,9 +16,8 @@ public class WishlistMapper {
         if (entity == null) {
             return null;
         }
-        // Converte a lista de ProductEntity para Product
         List<Product> products = entity.getProductsEntityList().stream()
-                .map(this::toDomain)
+                .map(this::toDomain)  // Converte ProductEntity para Product
                 .collect(Collectors.toList());
         return new Wishlist(entity.getClientId(), products);
     }
@@ -27,9 +26,8 @@ public class WishlistMapper {
         if (wishlist == null) {
             return null;
         }
-        // Converte a lista de Product para ProductEntity
         List<ProductEntity> productsEntityList = wishlist.getProducts().stream()
-                .map(this::toEntity)
+                .map(this::toEntity)  // Converte Product para ProductEntity
                 .collect(Collectors.toList());
         return new WishlistEntity(wishlist.getClientId(), productsEntityList);
     }

@@ -17,9 +17,9 @@ public class GetProductUseCaseImpl implements GetProductUseCase {
 
 
     @Override
-    public Wishlist execute(String clientId) throws Exception {
+    public Wishlist execute(String clientId) {
         return repository.findByClientId(clientId)
                 .map(mapper::toDomain)
-                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId, 404));
+                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
     }
 }

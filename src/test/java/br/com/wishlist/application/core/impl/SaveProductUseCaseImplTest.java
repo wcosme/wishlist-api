@@ -5,12 +5,10 @@ import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ class SaveProductUseCaseImplTest {
     private WishlistMapper mapper;
 
     @InjectMocks
-    private SaveProductUseCaseImpl saveProductUseCase;
+    private SaveProductUseCaseImpl useCase;
 
 
 
@@ -46,7 +44,7 @@ class SaveProductUseCaseImplTest {
         when(mapper.toDomain(wishlistEntity)).thenReturn(wishlist);
         when(mapper.toEntity(any(Wishlist.class))).thenReturn(wishlistEntity);
 
-        saveProductUseCase.execute(clientId, product);
+        useCase.execute(clientId, product);
 
         verify(repository).save(any(WishlistEntity.class));
         assertEquals(1, wishlist.getProducts().size());
@@ -63,7 +61,7 @@ class SaveProductUseCaseImplTest {
         when(repository.findByClientId(clientId)).thenReturn(Optional.empty());
         when(mapper.toEntity(any(Wishlist.class))).thenReturn(newWishlistEntity);
 
-        saveProductUseCase.execute(clientId, product);
+        useCase.execute(clientId, product);
 
         verify(repository).save(any(WishlistEntity.class));
         verify(mapper).toEntity(newWishlist);
@@ -86,7 +84,7 @@ class SaveProductUseCaseImplTest {
         when(mapper.toDomain(wishlistEntity)).thenReturn(wishlist);
 
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            saveProductUseCase.execute(clientId, product);
+            useCase.execute(clientId, product);
         });
 
         assertEquals("Cannot add more than 20 products to the wishlist.", exception.getMessage());
