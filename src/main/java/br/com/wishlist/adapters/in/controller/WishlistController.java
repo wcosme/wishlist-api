@@ -1,10 +1,9 @@
 package br.com.wishlist.adapters.in.controller;
 
-import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
-import br.com.wishlist.adapters.out.mapper.WishlistMapper;
 import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
 import br.com.wishlist.adapters.in.controller.request.RemoveProductRequest;
 import br.com.wishlist.adapters.in.controller.response.WishlistResponse;
+import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
 import br.com.wishlist.application.core.usecase.*;
@@ -22,20 +21,19 @@ public class WishlistController {
     private final DeleteProductUseCase deleteProductUseCase;
     private final GetProductUseCase getProductUseCase;
     private final CheckProductUseCase checkProductUseCase;
-    private final WishlistMapper mapper;
-    private final WishlistControllerMapper controllerMapper;
+    private final WishlistControllerMapper mapper;
 
     @PostMapping("/{clientId}/products")
     public ResponseEntity<WishlistResponse> addProduct(
             @PathVariable String clientId,
-            @RequestBody AddProductRequest request) throws Exception {
+            @RequestBody AddProductRequest request) {
 
-        Product product = controllerMapper.toProduct(request);
+        Product product = mapper.toProduct(request);
         saveProductUseCase.execute(clientId, product);
 
         // Recuperar a Wishlist atualizada para resposta
         Wishlist wishlist = getProductUseCase.execute(clientId);
-        WishlistResponse response = controllerMapper.toWishlistResponse(wishlist);
+        WishlistResponse response = mapper.toWishlistResponse(wishlist);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -43,24 +41,19 @@ public class WishlistController {
     @DeleteMapping("/{clientId}/products")
     public ResponseEntity<Void> removeProduct(
             @PathVariable String clientId,
-            @RequestBody RemoveProductRequest request) throws Exception {
+            @RequestBody RemoveProductRequest request) {
 
         deleteProductUseCase.execute(clientId, request.productId());
-
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{clientId}")
     public ResponseEntity<WishlistResponse> getWishlist(@PathVariable String clientId) {
 
-        try {
-            Wishlist wishlist = getProductUseCase.execute(clientId);
-            WishlistResponse response = controllerMapper.toWishlistResponse(wishlist);
+        Wishlist wishlist = getProductUseCase.execute(clientId);
+        WishlistResponse response = mapper.toWishlistResponse(wishlist);
 
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{clientId}/products/{productId}")
@@ -68,11 +61,7 @@ public class WishlistController {
             @PathVariable String clientId,
             @PathVariable String productId) {
 
-        try {
-            boolean exists = checkProductUseCase.execute(clientId, productId);
-            return ResponseEntity.ok(exists);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        boolean exists = checkProductUseCase.execute(clientId, productId);
+        return ResponseEntity.ok(exists);
     }
 }
