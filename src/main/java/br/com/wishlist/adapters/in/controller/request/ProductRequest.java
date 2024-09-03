@@ -1,6 +1,6 @@
 package br.com.wishlist.adapters.in.controller.request;
 
-public record AddProductRequest(
+public record ProductRequest(
         String productId,
         String name
 ) {

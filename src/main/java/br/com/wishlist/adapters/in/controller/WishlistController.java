@@ -1,7 +1,6 @@
 package br.com.wishlist.adapters.in.controller;
 
-import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
-import br.com.wishlist.adapters.in.controller.request.RemoveProductRequest;
+import br.com.wishlist.adapters.in.controller.request.ProductRequest;
 import br.com.wishlist.adapters.in.controller.response.WishlistResponse;
 import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
 import br.com.wishlist.application.core.domain.Product;
@@ -37,7 +36,7 @@ public class WishlistController {
     @PostMapping("/{clientId}/products")
     public ResponseEntity<WishlistResponse> addProduct(
             @PathVariable String clientId,
-            @RequestBody AddProductRequest request) {
+            @RequestBody ProductRequest request) {
 
         Product product = mapper.toProduct(request);
         saveProductUseCase.execute(clientId, product);
@@ -57,7 +56,7 @@ public class WishlistController {
     @DeleteMapping("/{clientId}/products")
     public ResponseEntity<Void> removeProduct(
             @PathVariable String clientId,
-            @RequestBody RemoveProductRequest request) {
+            @RequestBody ProductRequest request) {
 
         deleteProductUseCase.execute(clientId, request.productId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -1,6 +1,6 @@
 package br.com.wishlist.adapters.in.mapper;
 
-import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
+import br.com.wishlist.adapters.in.controller.request.ProductRequest;
 import br.com.wishlist.adapters.in.controller.response.WishlistResponse;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
@@ -24,7 +24,7 @@ class WishlistControllerMapperTest {
     @Test
     void toProduct_ShouldMapAddProductRequestToProduct() {
         // Arrange
-        AddProductRequest request = new AddProductRequest("product1", "Product 1");
+        ProductRequest request = new ProductRequest("product1", "Product 1");
 
         // Act
         Product product = mapper.toProduct(request);

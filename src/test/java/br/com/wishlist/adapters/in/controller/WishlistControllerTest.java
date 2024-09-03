@@ -1,6 +1,6 @@
 package br.com.wishlist.adapters.in.controller;
 
-import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
+import br.com.wishlist.adapters.in.controller.request.ProductRequest;
 import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
@@ -58,7 +58,7 @@ class WishlistControllerTest {
 
     @Test
     void shouldAddProductToWishlist() throws Exception {
-        AddProductRequest request = new AddProductRequest("product1", "Product 1");
+        ProductRequest request = new ProductRequest("product1", "Product 1");
 
         mockMvc.perform(post("/wishlist/client1/products")
                         .contentType("application/json")
