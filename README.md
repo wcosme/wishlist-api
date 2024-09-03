@@ -9,6 +9,9 @@ Este projeto é um microserviço para gerenciar a **Wishlist** de um cliente em 
 - **MongoDB**
 - **Docker**
 - **Docker Compose**
+- **JaCoCo**
+- **JUnit**
+- **Mockito**
 
 ## Funcionalidades
 
@@ -40,6 +43,10 @@ No diretório raiz do projeto, execute o seguinte comando para construir a image
 
 Após os containers serem iniciados, a aplicação estará disponível em http://localhost:8080.
 
+## Rodando os Testes
+Para rodar os testes unitários e verificar a cobertura de código, utilize o seguinte comando Maven:
+mvn clean test
+
 ## Endpoints Disponíveis
 
 - POST /api/wishlist/{clientId}/products -> Adicionar um produto na Wishlist
@@ -56,6 +63,18 @@ Exemplo de request body:
 - DELETE /api/wishlist/{clientId}/products/{productId} -> Remover um produto da Wishlist
 - GET /api/wishlist/{clientId}/products -> Consultar todos os produtos da Wishlist
 - GET /api/wishlist/{clientId}/products/{productId} -> Verificar se um produto está na Wishlist
+
+## Documentação da API
+A documentação da API está disponível através do Swagger UI. Após iniciar a aplicação, acesse:
+http://localhost:8080/swagger-ui/index.html
+
+## Estrutura do Projeto
+
+- src/main/java/br/com/wishlist/adapters/in/controller: Contém os controladores REST.
+- src/main/java/br/com/wishlist/adapters/out/repository: Contém os repositórios que interagem com o MongoDB.
+- src/main/java/br/com/wishlist/application/core/domain: Contém as entidades de domínio.
+- src/main/java/br/com/wishlist/application/core/usecase: Contém a lógica de negócio (Use Cases).
+- src/main/java/br/com/wishlist/exception: Contém as classes de tratamento de exceções.
 
 ## Configurações Adicionais
 

@@ -7,6 +7,8 @@ import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
 import br.com.wishlist.application.core.usecase.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/wishlist")
 @RequiredArgsConstructor
+@Tag(name = "Wishlist", description = "Endpoints para gerenciar a lista de desejos")
 public class WishlistController {
 
     private final SaveProductUseCase saveProductUseCase;
@@ -23,6 +26,7 @@ public class WishlistController {
     private final CheckProductUseCase checkProductUseCase;
     private final WishlistControllerMapper mapper;
 
+    @Operation(summary = "Adicionar produto à Wishlist", description = "Adiciona um novo produto à Wishlist")
     @PostMapping("/{clientId}/products")
     public ResponseEntity<WishlistResponse> addProduct(
             @PathVariable String clientId,
@@ -31,13 +35,13 @@ public class WishlistController {
         Product product = mapper.toProduct(request);
         saveProductUseCase.execute(clientId, product);
 
-        // Recuperar a Wishlist atualizada para resposta
         Wishlist wishlist = getProductUseCase.execute(clientId);
         WishlistResponse response = mapper.toWishlistResponse(wishlist);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "Remover produto da Wishlist", description = "Remove um produto da Wishlist")
     @DeleteMapping("/{clientId}/products")
     public ResponseEntity<Void> removeProduct(
             @PathVariable String clientId,
@@ -47,6 +51,7 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Obter Wishlist do Cliente", description = "Retorna a Wishlist")
     @GetMapping("/{clientId}")
     public ResponseEntity<WishlistResponse> getWishlist(@PathVariable String clientId) {
 
@@ -56,6 +61,7 @@ public class WishlistController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Verificar Produto na Wishlist", description = "Verifica se um produto está na Wishlist")
     @GetMapping("/{clientId}/products/{productId}")
     public ResponseEntity<Boolean> checkProductInWishlist(
             @PathVariable String clientId,
