@@ -16,27 +16,22 @@ import java.util.Optional;
 public class SaveProductUseCaseImpl implements SaveProductUseCase {
 
     private final MongoWishlistRepository repository;
-    private final WishlistMapper wishlistMapper;
+    private final WishlistMapper mapper;
 
     @Override
     public void execute(String clientId, Product product) throws Exception {
 
-        // Recupere a WishlistEntity do banco de dados
-        Optional<WishlistEntity> wishlistEntityOpt = repository.findByClientId(clientId);
+        Optional<WishlistEntity> optional = repository.findByClientId(clientId);
 
         Wishlist wishlist;
 
-        // Converta a entidade para o domínio, se existir
-        if (wishlistEntityOpt.isPresent()) {
-            wishlist = wishlistMapper.toDomain(wishlistEntityOpt.get());
+        if (optional.isPresent()) {
+            wishlist = mapper.toDomain(optional.get());
         } else {
-            wishlist = new Wishlist(clientId); // Crie uma nova Wishlist se não existir
+            wishlist = new Wishlist(clientId);
         }
-
-        // Adiciona o produto à Wishlist
         wishlist.addProduct(product);
 
-        // Converta o domínio de volta para a entidade e salve
-        repository.save(wishlistMapper.toEntity(wishlist));
+        repository.save(mapper.toEntity(wishlist));
     }
 }

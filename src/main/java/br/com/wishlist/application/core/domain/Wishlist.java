@@ -55,9 +55,6 @@ public class Wishlist {
         return products.removeIf(product -> product.getProductId().equals(productId));
     }
 
-    public boolean hasProduct(String productId) {
-        return products.stream().anyMatch(product -> product.getProductId().equals(productId));
-    }
 
     // equals e hashCode
     @Override

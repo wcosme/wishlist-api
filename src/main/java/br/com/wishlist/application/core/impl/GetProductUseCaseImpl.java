@@ -4,6 +4,7 @@ import br.com.wishlist.adapters.out.mapper.WishlistMapper;
 import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.application.core.usecase.GetProductUseCase;
 import br.com.wishlist.application.core.domain.Wishlist;
+import br.com.wishlist.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,6 @@ public class GetProductUseCaseImpl implements GetProductUseCase {
     public Wishlist execute(String clientId) throws Exception {
         return repository.findByClientId(clientId)
                 .map(mapper::toDomain)
-                .orElseThrow(() -> new Exception("Wishlist not found for client: " + clientId));
+                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId, 404));
     }
 }

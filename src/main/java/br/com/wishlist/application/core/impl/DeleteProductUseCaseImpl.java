@@ -5,6 +5,7 @@ import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.usecase.DeleteProductUseCase;
 import br.com.wishlist.application.core.domain.Wishlist;
+import br.com.wishlist.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +20,13 @@ public class DeleteProductUseCaseImpl implements DeleteProductUseCase {
     public void execute(String clientId, String productId) throws Exception {
 
         WishlistEntity entity = repository.findByClientId(clientId)
-                .orElseThrow(() -> new Exception("Wishlist not found for client: " + clientId));
+                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId, 404));
 
         Wishlist wishlist = mapper.toDomain(entity);
 
         boolean removed = wishlist.removeProductById(productId);
         if (!removed) {
-            throw new Exception("Product not found in the wishlist: " + productId);
+            throw new CustomException("Product not found in the wishlist: " + productId, 404);
         }
 
         repository.save(mapper.toEntity(wishlist));
