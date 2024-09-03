@@ -8,6 +8,8 @@ import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
 import br.com.wishlist.application.core.usecase.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,12 @@ public class WishlistController {
     private final CheckProductUseCase checkProductUseCase;
     private final WishlistControllerMapper mapper;
 
-    @Operation(summary = "Adicionar produto à Wishlist", description = "Adiciona um novo produto à Wishlist")
+    @Operation(summary = "Add a product to the wishlist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Product successfully added to the wishlist"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/{clientId}/products")
     public ResponseEntity<WishlistResponse> addProduct(
             @PathVariable String clientId,
@@ -41,7 +48,12 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Remover produto da Wishlist", description = "Remove um produto da Wishlist")
+    @Operation(summary = "Remove a product from the wishlist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Product successfully removed from the wishlist"),
+            @ApiResponse(responseCode = "404", description = "Product or wishlist not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/{clientId}/products")
     public ResponseEntity<Void> removeProduct(
             @PathVariable String clientId,
@@ -51,7 +63,12 @@ public class WishlistController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @Operation(summary = "Obter Wishlist do Cliente", description = "Retorna a Wishlist")
+    @Operation(summary = "Get the wishlist for a client")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the wishlist"),
+            @ApiResponse(responseCode = "404", description = "Wishlist not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{clientId}")
     public ResponseEntity<WishlistResponse> getWishlist(@PathVariable String clientId) {
 
@@ -61,7 +78,12 @@ public class WishlistController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Verificar Produto na Wishlist", description = "Verifica se um produto está na Wishlist")
+    @Operation(summary = "Check if a product is in the wishlist")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product found in the wishlist"),
+            @ApiResponse(responseCode = "404", description = "Product or wishlist not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/{clientId}/products/{productId}")
     public ResponseEntity<Boolean> checkProductInWishlist(
             @PathVariable String clientId,
