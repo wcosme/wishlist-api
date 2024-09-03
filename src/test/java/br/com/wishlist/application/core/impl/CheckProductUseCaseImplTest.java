@@ -14,8 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,31 +32,30 @@ class CheckProductUseCaseImplTest {
     @InjectMocks
     private CheckProductUseCaseImpl useCase;
 
-    private WishlistEntity entity;
+    private WishlistEntity wishlistEntity;
     private Wishlist wishlist;
+    private Product product;
 
     @BeforeEach
     void setUp() {
-        entity = new WishlistEntity("client1", new ArrayList<>());
-        wishlist = new Wishlist("client1", new ArrayList<>());
+        product = new Product("product1", "Product 1");
+        wishlistEntity = new WishlistEntity("client1", Collections.singletonList(new ProductEntity("product1", "Product 1")));
+        wishlist = new Wishlist("client1", Collections.singletonList(product));
     }
 
     @Test
     void execute_ShouldReturnTrueWhenProductExistsInWishlist() {
         // Arrange
-        ProductEntity productEntity = new ProductEntity("product1", "Product 1");
-        entity = new WishlistEntity("client1", List.of(productEntity));
-
-        when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(new Wishlist("client1", List.of(new Product("product1", "Product 1"))));
+        when(repository.findByClientId("client1")).thenReturn(Optional.of(wishlistEntity));
+        when(mapper.toDomain(wishlistEntity)).thenReturn(wishlist);
 
         // Act
         boolean result = useCase.execute("client1", "product1");
 
         // Assert
-        assertTrue(result, "Product should exist in the wishlist");
+        assertTrue(result);
         verify(repository).findByClientId("client1");
-        verify(mapper).toDomain(entity);
+        verify(mapper).toDomain(wishlistEntity);
     }
 
     @Test
@@ -78,8 +76,9 @@ class CheckProductUseCaseImplTest {
     @Test
     void execute_ShouldThrowCustomExceptionWhenProductNotFoundInWishlist() {
         // Arrange
-        when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(wishlist);
+        wishlist = new Wishlist("client1", Collections.emptyList());  // Wishlist sem produtos
+        when(repository.findByClientId("client1")).thenReturn(Optional.of(wishlistEntity));
+        when(mapper.toDomain(wishlistEntity)).thenReturn(wishlist);
 
         // Act & Assert
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -88,6 +87,20 @@ class CheckProductUseCaseImplTest {
 
         assertEquals("Product not found in the wishlist: product1", exception.getMessage());
         verify(repository).findByClientId("client1");
-        verify(mapper).toDomain(entity);
+        verify(mapper).toDomain(wishlistEntity);
+    }
+
+    @Test
+    void execute_ShouldCatchAndRethrowUnexpectedException() {
+        // Arrange
+        when(repository.findByClientId("client1")).thenThrow(new RuntimeException("Database error"));
+
+        // Act & Assert
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            useCase.execute("client1", "product1");
+        });
+
+        assertEquals("An unexpected error occurred while checking the product in the wishlist.", exception.getMessage());
+        verify(repository).findByClientId("client1");
     }
 }

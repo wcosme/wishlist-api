@@ -5,6 +5,7 @@ import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
+import br.com.wishlist.exception.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,5 +84,19 @@ class DeleteProductUseCaseImplTest {
 
         assertEquals("Product not found in the wishlist: product1", exception.getMessage());
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    void execute_ShouldCatchAndRethrowUnexpectedException() {
+        // Arrange
+        when(repository.findByClientId("client1")).thenThrow(new RuntimeException("Database error"));
+
+        // Act & Assert
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            useCase.execute("client1", "product1");
+        });
+
+        assertEquals("An unexpected error occurred while deleting the product from the wishlist.", exception.getMessage());
+        verify(repository).findByClientId("client1");
     }
 }
