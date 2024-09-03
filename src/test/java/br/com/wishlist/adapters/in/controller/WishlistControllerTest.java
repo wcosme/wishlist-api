@@ -1,9 +1,12 @@
 package br.com.wishlist.adapters.in.controller;
 
 import br.com.wishlist.adapters.in.controller.request.AddProductRequest;
+import br.com.wishlist.adapters.in.mapper.WishlistControllerMapper;
 import br.com.wishlist.application.core.domain.Product;
+import br.com.wishlist.application.core.domain.Wishlist;
 import br.com.wishlist.application.core.usecase.*;
 import br.com.wishlist.adapters.in.controller.response.WishlistResponse;
+import br.com.wishlist.exception.CustomException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -41,8 +45,11 @@ class WishlistControllerTest {
     @MockBean
     private CheckProductUseCase checkProductUseCase;
 
+    @MockBean
+    private WishlistControllerMapper mapper;
+
     @Autowired
-    private ObjectMapper mapper;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +62,7 @@ class WishlistControllerTest {
 
         mockMvc.perform(post("/wishlist/client1/products")
                         .contentType("application/json")
-                        .content(mapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 
@@ -63,25 +70,30 @@ class WishlistControllerTest {
     void shouldRemoveProductFromWishlist() throws Exception {
         mockMvc.perform(delete("/wishlist/client1/products")
                         .contentType("application/json")
-                        .content(mapper.writeValueAsString(new WishlistResponse("client1", List.of()))))
+                        .content(objectMapper.writeValueAsString(new WishlistResponse("client1", List.of()))))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldReturnWishlistForClient() throws Exception {
         // Arrange
+        String clientId = "client1";
         Product product = new Product("product1", "Product 1");
-        WishlistResponse response = new WishlistResponse("client1", List.of(product));
+        Wishlist wishlist = new Wishlist(clientId, List.of(product));
+        WishlistResponse response = new WishlistResponse(clientId, List.of(product));
 
-        when(getProductUseCase.execute(anyString())).thenReturn(response);
+        when(getProductUseCase.execute(clientId)).thenReturn(wishlist);
+        when(mapper.toWishlistResponse(wishlist)).thenReturn(response);
 
         // Act & Assert
-        mockMvc.perform(get("/wishlist/client1"))
+        mockMvc.perform(get("/wishlist/{clientId}", clientId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.clientId").value("client1"))
+                .andExpect(jsonPath("$.clientId").value(clientId))
                 .andExpect(jsonPath("$.products[0].productId").value("product1"))
                 .andExpect(jsonPath("$.products[0].name").value("Product 1"));
     }
+
 
     @Test
     void shouldCheckProductInWishlist() throws Exception {
@@ -90,5 +102,21 @@ class WishlistControllerTest {
         mockMvc.perform(get("/wishlist/client1/products/product1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenWishlistNotFound() throws Exception {
+        when(getProductUseCase.execute(anyString())).thenThrow(new CustomException("Wishlist not found"));
+
+        mockMvc.perform(get("/wishlist/client1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenProductNotInWishlist() throws Exception {
+        when(checkProductUseCase.execute(anyString(), anyString())).thenThrow(new CustomException("Product not found"));
+
+        mockMvc.perform(get("/wishlist/client1/products/product1"))
+                .andExpect(status().isNotFound());
     }
 }

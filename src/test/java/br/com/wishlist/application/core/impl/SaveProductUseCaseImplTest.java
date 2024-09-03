@@ -5,6 +5,7 @@ import br.com.wishlist.adapters.out.repository.MongoWishlistRepository;
 import br.com.wishlist.adapters.out.repository.entity.WishlistEntity;
 import br.com.wishlist.application.core.domain.Product;
 import br.com.wishlist.application.core.domain.Wishlist;
+import br.com.wishlist.exception.CustomException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,7 +35,7 @@ class SaveProductUseCaseImplTest {
 
 
     @Test
-    void execute_ShouldAddProductToExistingWishlist() throws Exception {
+    void execute_ShouldAddProductToExistingWishlist() {
         String clientId = "client1";
         Product product = new Product("product1", "Product 1");
         WishlistEntity wishlistEntity = new WishlistEntity(clientId, new ArrayList<>());
@@ -52,7 +53,7 @@ class SaveProductUseCaseImplTest {
     }
 
     @Test
-    void execute_ShouldCreateNewWishlistIfNotFound() throws Exception {
+    void execute_ShouldCreateNewWishlistIfNotFound(){
         String clientId = "client2";
         Product product = new Product("product2", "Product 2");
         Wishlist newWishlist = new Wishlist(clientId);
@@ -83,7 +84,7 @@ class SaveProductUseCaseImplTest {
         when(repository.findByClientId(clientId)).thenReturn(Optional.of(wishlistEntity));
         when(mapper.toDomain(wishlistEntity)).thenReturn(wishlist);
 
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
+        Exception exception = assertThrows(CustomException.class, () -> {
             useCase.execute(clientId, product);
         });
 

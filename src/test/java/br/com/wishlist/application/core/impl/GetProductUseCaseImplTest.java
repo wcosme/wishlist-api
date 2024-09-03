@@ -60,9 +60,7 @@ class GetProductUseCaseImplTest {
         when(repository.findByClientId("client1")).thenReturn(Optional.empty());
 
         // Act & Assert
-        CustomException exception = assertThrows(CustomException.class, () -> {
-            useCase.execute("client1");
-        });
+        CustomException exception = assertThrows(CustomException.class, () -> useCase.execute("client1"));
 
         assertEquals("Wishlist not found for client: client1", exception.getMessage());
         verify(repository).findByClientId("client1");
