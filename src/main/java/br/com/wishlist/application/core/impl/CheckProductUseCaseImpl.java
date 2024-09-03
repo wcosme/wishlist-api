@@ -17,20 +17,25 @@ public class CheckProductUseCaseImpl implements CheckProductUseCase {
     private final WishlistMapper mapper;
 
     public boolean execute(String clientId, String productId) {
-        WishlistEntity entity = repository.findByClientId(clientId)
-                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
+        try {
+            WishlistEntity entity = repository.findByClientId(clientId)
+                    .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
 
-        Wishlist wishlist = mapper.toDomain(entity);
+            Wishlist wishlist = mapper.toDomain(entity);
 
-        // Depuração: imprimir produtos
-        System.out.println("Products in Wishlist: " + wishlist.getProducts());
+            boolean productExists = wishlist.getProducts()
+                    .stream()
+                    .anyMatch(product -> product.getProductId().equals(productId));
 
-        boolean productExists = wishlist.getProducts().stream()
-                .anyMatch(product -> product.getProductId().equals(productId));
-
-        if (!productExists) {
-            throw new CustomException("Product not found in the wishlist: " + productId);
+            if (!productExists) {
+                throw new CustomException("Product not found in the wishlist: " + productId);
+            }
+            return true;
+        } catch (CustomException e) {
+            // Relançar a CustomException a ser tratada pelo GlobalExceptionHandler
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while checking the product in the wishlist.");
         }
-        return true;
     }
 }

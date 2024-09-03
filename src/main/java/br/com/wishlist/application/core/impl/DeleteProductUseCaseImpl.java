@@ -17,19 +17,24 @@ public class DeleteProductUseCaseImpl implements DeleteProductUseCase {
     private final WishlistMapper mapper;
 
     @Override
-    public void execute(String clientId, String productId){
+    public void execute(String clientId, String productId) {
+        try {
+            WishlistEntity entity = repository.findByClientId(clientId)
+                    .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
 
-        WishlistEntity entity = repository.findByClientId(clientId)
-                .orElseThrow(() -> new CustomException("Wishlist not found for client: " + clientId));
+            Wishlist wishlist = mapper.toDomain(entity);
 
-        Wishlist wishlist = mapper.toDomain(entity);
+            boolean removed = wishlist.removeProductById(productId);
+            if (!removed) {
+                throw new CustomException("Product not found in the wishlist: " + productId);
+            }
 
-        boolean removed = wishlist.removeProductById(productId);
-        if (!removed) {
-            throw new CustomException("Product not found in the wishlist: " + productId);
+            repository.save(mapper.toEntity(wishlist));
+        } catch (CustomException e) {
+            // Relançar a CustomException a ser tratada pelo GlobalExceptionHandler
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while deleting the product from the wishlist.");
         }
-
-        repository.save(mapper.toEntity(wishlist));
     }
-
 }
