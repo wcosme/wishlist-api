@@ -58,8 +58,10 @@ class WishlistControllerTest {
 
     @Test
     void shouldAddProductToWishlist() throws Exception {
+        // Given
         ProductRequest request = new ProductRequest("product1", "Product 1");
 
+        // When & Then
         mockMvc.perform(post("/wishlist/client1/products")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
@@ -68,15 +70,19 @@ class WishlistControllerTest {
 
     @Test
     void shouldRemoveProductFromWishlist() throws Exception {
+        // Given
+        WishlistResponse response = new WishlistResponse("client1", List.of());
+
+        // When & Then
         mockMvc.perform(delete("/wishlist/client1/products")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(new WishlistResponse("client1", List.of()))))
+                        .content(objectMapper.writeValueAsString(response)))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldReturnWishlistForClient() throws Exception {
-        // Arrange
+        // Given
         String clientId = "client1";
         Product product = new Product("product1", "Product 1");
         Wishlist wishlist = new Wishlist(clientId, List.of(product));
@@ -85,7 +91,7 @@ class WishlistControllerTest {
         when(getProductUseCase.execute(clientId)).thenReturn(wishlist);
         when(mapper.toWishlistResponse(wishlist)).thenReturn(response);
 
-        // Act & Assert
+        // When & Then
         mockMvc.perform(get("/wishlist/{clientId}", clientId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -94,11 +100,12 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.products[0].name").value("Product 1"));
     }
 
-
     @Test
     void shouldCheckProductInWishlist() throws Exception {
+        // Given
         when(checkProductUseCase.execute(anyString(), anyString())).thenReturn(true);
 
+        // When & Then
         mockMvc.perform(get("/wishlist/client1/products/product1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
@@ -106,16 +113,20 @@ class WishlistControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenWishlistNotFound() throws Exception {
+        // Given
         when(getProductUseCase.execute(anyString())).thenThrow(new CustomException("Wishlist not found"));
 
+        // When & Then
         mockMvc.perform(get("/wishlist/client1"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturnNotFoundWhenProductNotInWishlist() throws Exception {
+        // Given
         when(checkProductUseCase.execute(anyString(), anyString())).thenThrow(new CustomException("Product not found"));
 
+        // When & Then
         mockMvc.perform(get("/wishlist/client1/products/product1"))
                 .andExpect(status().isNotFound());
     }

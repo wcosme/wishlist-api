@@ -20,11 +20,14 @@ class WishlistMapperTest {
 
     @Test
     void shouldMapWishlistEntityToWishlist() {
+        // Given
         ProductEntity productEntity = new ProductEntity("product1", "Product 1");
         WishlistEntity wishlistEntity = new WishlistEntity("client1", List.of(productEntity));
 
+        // When
         Wishlist wishlist = mapper.toDomain(wishlistEntity);
 
+        // Then
         assertNotNull(wishlist);
         assertEquals(1, wishlist.getProducts().size());
         assertEquals("product1", wishlist.getProducts().get(0).getProductId());
@@ -32,11 +35,14 @@ class WishlistMapperTest {
 
     @Test
     void shouldMapWishlistToWishlistEntity() {
+        // Given
         Product product = new Product("product1", "Product 1");
         Wishlist wishlist = new Wishlist("client1", List.of(product));
 
+        // When
         WishlistEntity wishlistEntity = mapper.toEntity(wishlist);
 
+        // Then
         assertNotNull(wishlistEntity);
         assertEquals(1, wishlistEntity.getProductsEntityList().size());
         assertEquals("product1", wishlistEntity.getProductsEntityList().get(0).getProductId());

@@ -16,9 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteProductUseCaseImplTest {
@@ -42,61 +44,61 @@ class DeleteProductUseCaseImplTest {
     }
 
     @Test
-    void execute_ShouldRemoveProductFromWishlist() throws Exception {
-        // Arrange
+    void shouldRemoveProductFromWishlist() throws Exception {
+        // Given
         wishlist.addProduct(new Product("product1", "Product 1"));
-        when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(wishlist);
-        when(mapper.toEntity(wishlist)).thenReturn(entity);
+        given(repository.findByClientId("client1")).willReturn(Optional.of(entity));
+        given(mapper.toDomain(entity)).willReturn(wishlist);
+        given(mapper.toEntity(wishlist)).willReturn(entity);
 
-        // Act
+        // When
         useCase.execute("client1", "product1");
 
-        // Assert
+        // Then
         assertTrue(wishlist.getProducts().isEmpty());
-        verify(repository).save(entity);
+        then(repository).should().save(entity);
     }
 
     @Test
-    void execute_ShouldThrowExceptionWhenWishlistNotFound() {
-        // Arrange
-        when(repository.findByClientId("client1")).thenReturn(Optional.empty());
+    void shouldThrowExceptionWhenWishlistNotFound() {
+        // Given
+        given(repository.findByClientId("client1")).willReturn(Optional.empty());
 
-        // Act & Assert
+        // When & Then
         Exception exception = assertThrows(Exception.class, () -> {
             useCase.execute("client1", "product1");
         });
 
         assertEquals("Wishlist not found for client: client1", exception.getMessage());
-        verify(repository, never()).save(any());
+        then(repository).should(never()).save(any());
     }
 
     @Test
-    void execute_ShouldThrowExceptionWhenProductNotFoundInWishlist() {
-        // Arrange
-        when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(wishlist);
+    void shouldThrowExceptionWhenProductNotFoundInWishlist() {
+        // Given
+        given(repository.findByClientId("client1")).willReturn(Optional.of(entity));
+        given(mapper.toDomain(entity)).willReturn(wishlist);
 
-        // Act & Assert
+        // When & Then
         Exception exception = assertThrows(Exception.class, () -> {
             useCase.execute("client1", "product1");
         });
 
         assertEquals("Product not found in the wishlist: product1", exception.getMessage());
-        verify(repository, never()).save(any());
+        then(repository).should(never()).save(any());
     }
 
     @Test
-    void execute_ShouldCatchAndRethrowUnexpectedException() {
-        // Arrange
-        when(repository.findByClientId("client1")).thenThrow(new RuntimeException("Database error"));
+    void shouldCatchAndRethrowUnexpectedException() {
+        // Given
+        given(repository.findByClientId("client1")).willThrow(new RuntimeException("Database error"));
 
-        // Act & Assert
+        // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
             useCase.execute("client1", "product1");
         });
 
         assertEquals("An unexpected error occurred while deleting the product from the wishlist.", exception.getMessage());
-        verify(repository).findByClientId("client1");
+        then(repository).should().findByClientId("client1");
     }
 }

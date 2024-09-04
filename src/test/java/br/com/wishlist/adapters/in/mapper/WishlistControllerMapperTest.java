@@ -22,38 +22,41 @@ class WishlistControllerMapperTest {
     }
 
     @Test
-    void toProduct_ShouldMapAddProductRequestToProduct() {
-        // Arrange
+    void shouldMapProductRequestToProduct() {
+        // Given
         ProductRequest request = new ProductRequest("product1", "Product 1");
 
-        // Act
+        // When
         Product product = mapper.toProduct(request);
 
-        // Assert
+        // Then
         assertNotNull(product);
         assertEquals("product1", product.getProductId());
         assertEquals("Product 1", product.getName());
     }
 
     @Test
-    void toProduct_ShouldReturnNullWhenRequestIsNull() {
-        // Act
-        Product product = mapper.toProduct(null);
+    void shouldReturnNullWhenProductRequestIsNull() {
+        // Given
+        ProductRequest request = null;
 
-        // Assert
+        // When
+        Product product = mapper.toProduct(request);
+
+        // Then
         assertNull(product);
     }
 
     @Test
-    void toWishlistResponse_ShouldMapWishlistToWishlistResponse() {
-        // Arrange
+    void shouldMapWishlistToWishlistResponse() {
+        // Given
         Product product = new Product("product1", "Product 1");
         Wishlist wishlist = new Wishlist("client1", List.of(product));
 
-        // Act
+        // When
         WishlistResponse response = mapper.toWishlistResponse(wishlist);
 
-        // Assert
+        // Then
         assertNotNull(response);
         assertEquals("client1", response.clientId());
         assertNotNull(response.products());
@@ -63,23 +66,26 @@ class WishlistControllerMapperTest {
     }
 
     @Test
-    void toWishlistResponse_ShouldReturnNullWhenWishlistIsNull() {
-        // Act
-        WishlistResponse response = mapper.toWishlistResponse(null);
+    void shouldReturnNullWhenWishlistIsNull() {
+        // Given
+        Wishlist wishlist = null;
 
-        // Assert
+        // When
+        WishlistResponse response = mapper.toWishlistResponse(wishlist);
+
+        // Then
         assertNull(response);
     }
 
     @Test
-    void toWishlistResponse_ShouldHandleEmptyProductList() {
-        // Arrange
+    void shouldHandleEmptyProductListInWishlist() {
+        // Given
         Wishlist wishlist = new Wishlist("client1", Collections.emptyList());
 
-        // Act
+        // When
         WishlistResponse response = mapper.toWishlistResponse(wishlist);
 
-        // Assert
+        // Then
         assertNotNull(response);
         assertEquals("client1", response.clientId());
         assertNotNull(response.products());

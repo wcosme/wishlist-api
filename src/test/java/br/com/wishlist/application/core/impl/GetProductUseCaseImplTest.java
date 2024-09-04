@@ -14,8 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class GetProductUseCaseImplTest {
@@ -39,31 +42,31 @@ class GetProductUseCaseImplTest {
     }
 
     @Test
-    void execute_ShouldReturnWishlistWhenFound() {
-        // Arrange
-        when(repository.findByClientId("client1")).thenReturn(Optional.of(entity));
-        when(mapper.toDomain(entity)).thenReturn(wishlist);
+    void shouldReturnWishlistWhenFound() {
+        // Given
+        given(repository.findByClientId("client1")).willReturn(Optional.of(entity));
+        given(mapper.toDomain(entity)).willReturn(wishlist);
 
-        // Act
+        // When
         Wishlist result = useCase.execute("client1");
 
-        // Assert
+        // Then
         assertNotNull(result);
         assertEquals("client1", result.getClientId());
-        verify(repository).findByClientId("client1");
-        verify(mapper).toDomain(entity);
+        then(repository).should().findByClientId("client1");
+        then(mapper).should().toDomain(entity);
     }
 
     @Test
-    void execute_ShouldThrowCustomExceptionWhenWishlistNotFound() {
-        // Arrange
-        when(repository.findByClientId("client1")).thenReturn(Optional.empty());
+    void shouldThrowCustomExceptionWhenWishlistNotFound() {
+        // Given
+        given(repository.findByClientId("client1")).willReturn(Optional.empty());
 
-        // Act & Assert
+        // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> useCase.execute("client1"));
 
         assertEquals("Wishlist not found for client: client1", exception.getMessage());
-        verify(repository).findByClientId("client1");
-        verify(mapper, never()).toDomain(any());
+        then(repository).should().findByClientId("client1");
+        then(mapper).should(never()).toDomain(any());
     }
 }
