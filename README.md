@@ -12,6 +12,7 @@ Este projeto é um microserviço para gerenciar a **Wishlist** de um cliente em 
 - **JaCoCo**
 - **JUnit**
 - **Mockito**
+- **BDD**
 
 ## Funcionalidades
 
